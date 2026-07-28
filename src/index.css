@@ -1,0 +1,49 @@
+/* Import de la police Google Fonts (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* LA NOUVELLE FAÇON D'IMPORTER TAILWIND V4 */
+@import "tailwindcss";
+
+/* Configuration des couleurs personnalisées pour IMARDOS */
+@theme {
+  --color-imardos-blue: #0f3b76;
+  --color-imardos-light-blue: #eef2f7;
+  --color-imardos-orange: #f59e0b;
+  --color-imardos-green: #10b981;
+  --color-imardos-red: #ef4444;
+  --color-imardos-dark: #1e293b;
+}
+
+/* Application des styles de base */
+@layer base {
+  body {
+    background-color: var(--color-gray-50);
+    color: var(--color-imardos-dark);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: var(--color-imardos-blue);
+  }
+}
+
+/* Composants réutilisables */
+@layer components {
+  .btn-primary {
+    background-color: var(--color-imardos-orange);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-primary:hover {
+    background-color: #ea580c;
+  }
+}
