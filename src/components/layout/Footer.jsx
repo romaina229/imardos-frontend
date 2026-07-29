@@ -32,10 +32,10 @@ const Footer = () => {
               IMARDOS agit pour le bien-être des communautés, en mettant l'accent sur la santé, l'éducation et le développement durable.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaFacebook size={18} /></a>
-              <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaXTwitter size={18} /></a>
-              <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaInstagram size={18} /></a>
-              <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaYoutube size={18} /></a>
+              <a href="https://www.facebook.com/profile.php?id=100080912787464" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaFacebook size={18} /></a>
+              <a href="https://www.linkedin.com/company/imardos-ong" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaLinkedin size={18} /></a>
+              <a href="https://www.instagram.com/imardos_ong/" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaInstagram size={18} /></a>
+              <a href="https://youtu.be/6cXvOqmwiE4?si=X4OLT8LjoT3THjTo" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaYoutube size={18} /></a>
             </div>
           </div>
 
@@ -72,7 +72,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="text-imardos-orange shrink-0" />
-                <span>+229 00 00 00 00</span>
+                <span>+229 01 40 15 24 43</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-imardos-orange shrink-0" />
