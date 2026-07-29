@@ -13,7 +13,7 @@ const Navbar = () => {
     { name: 'Évènements', path: '/evenements' },         
     { name: 'Galerie', path: '/galerie' },               
     { name: 'Blog', path: '/blog' },
-    { name: 'Avis', path: '/avis' },                     
+    //{ name: 'Avis', path: '/avis' },                     
     { name: 'Contact', path: '/contact' },
   ];
 
@@ -22,12 +22,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-4">
-          <img
-            src="/logos/logo-imardoss.jpg"
-            alt="IMARDOS ONG"
-            className="h-14 w-auto"
-          />
+        <Link to="/" className="flex items-center gap-3">
+          <div className="h-35 w-35 rounded-full bg-white shadow-md overflow-hidden flex items-center justify-center">
+            <img
+              src="/files/IMARDOS-logo-principal.png"
+              alt="IMARDOS ONG"
+              className="h-full w-full object-cover scale-110 transition-transform duration-300 hover:scale-120"
+            />
+          </div>
           <span className="text-2xl font-bold tracking-wide text-white">
             IMARDOS ONG
           </span>

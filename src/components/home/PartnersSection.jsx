@@ -37,6 +37,10 @@ const partners = [
     name: "Droit d'elle",
     logo: "/logos/elle.png",
   },
+  {
+    name: "ABPF",
+    logo: "/logos/logoabpf.jpg",
+  },
 ];
 
 const PartnersSection = () => {

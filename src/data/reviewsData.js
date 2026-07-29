@@ -1,6 +1,0 @@
-export const reviewsData = [
-  { id: 1, name: "Mme. Fatima D.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80", rating: 5, date: "Août 2024", comment: "IMARDOS a changé ma vie. Grâce à leur formation, je gère désormais ma propre boutique." },
-  { id: 2, name: "Jean K.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80", rating: 4, date: "Juillet 2024", comment: "Le soutien scolaire offert par IMARDOS a permis à mes enfants d'améliorer leurs notes. Je recommande !" },
-  { id: 3, name: "M. François H.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80", rating: 5, date: "Juin 2024", comment: "Une équipe très professionnelle et à l'écoute des besoins des communautés rurales." },
-  { id: 4, name: "Aïssa T.", avatar: "https://images.unsplash.com/photo-1488716820095-cbe80883c496?auto=format&fit=crop&w=80", rating: 5, date: "Septembre 2024", comment: "J'ai appris beaucoup sur mes droits en matière de santé reproductive. Merci IMARDOS !" }
-];

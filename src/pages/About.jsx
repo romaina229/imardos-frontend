@@ -5,20 +5,23 @@ const About = () => {
     <div className="bg-white">
       
       {/* --- SECTION 1: HERO DE LA PAGE (Comme sur la maquette) --- */}
-      <section className="relative bg-imardos-blue text-white py-20 md:py-28">
+      <section className="relative text-white py-25 md:py-28 overflow-hidden">
+        {/* Image en arrière-plan, sur toute la section */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://media.istockphoto.com/id/1319013519/fr/photo/verticale-de-femme-africaine-adolescente-regardant-lappareil-photo-portant-un-paquet-de-bois.jpg?s=612x612&w=0&k=20&c=1WN_Iv-cazSUFUPp42hJaKkKNxrmdVI7mSsg2kFGe_M=" 
+            alt="Équipe IMARDOS" 
+            className="w-full h-full object-cover"
+          />
+          {/* Voile bleu pour garder le texte lisible et rester dans la charte IMARDOS */}
+          <div className="absolute inset-0 bg-imardos-blue/30"></div>
+        </div>
+
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">À propos de nous</h1>
           <p className="text-imardos-light-blue text-lg max-w-2xl">
             Découvrez qui nous sommes, notre mission, nos valeurs et notre engagement pour le développement communautaire.
           </p>
-        </div>
-        {/* Image décorative (Optionnel, comme sur la planche 2) */}
-        <div className="absolute right-0 top-0 h-full w-1/3 hidden lg:block">
-          <img 
-            src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=800" 
-            alt="Équipe IMARDOS" 
-            className="w-full h-full object-cover opacity-20 mix-blend-overlay"
-          />
         </div>
       </section>
 

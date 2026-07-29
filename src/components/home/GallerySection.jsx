@@ -4,9 +4,9 @@ const images = [
   'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=400&h=300',
   'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=400&h=300',
   'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=400&h=300',
-  'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=400&h=300',
+  'https://scontent.fcoo4-1.fna.fbcdn.net/v/t39.30808-6/746909452_1070302749010141_1372475787662548497_n.jpg?stp=dst-jpg_tt6&cstp=mx1873x840&ctp=p180x540&_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeE3h3vPpD_J_JsZ6l35AmVqtLRMo78l-ga0tEyjvyX6Bp0kf2BY0PkqkrYbjGDY-dX3Z3qRmv_wnbJ22GbYzkBh&_nc_ohc=pd68iX4Gfp8Q7kNvwH9mPze&_nc_oc=AdqpNkWC7jnPNfYp3ziL9p_wvTdZgDL9GLdW1GH-VVuyVEpKc7JQzskGfM_gN6wcjqM&_nc_zt=23&_nc_ht=scontent.fcoo4-1.fna&_nc_gid=UnOd8hsYOMYYyAeuqpiJFw&_nc_ss=7b2a8&oh=00_AQCSVX_KYMVlTNXIKFgS8NhjKczUcDxMPcy432vINfmgoQ&oe=6A6FDD38',
   'https://imardosong.22web.org/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-19-at-20.46.10.jpeg',
-  'https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&q=80&w=400&h=300'
+  'https://scontent.fcoo4-1.fna.fbcdn.net/v/t39.30808-6/741464562_1066310276076055_6919953079577792027_n.jpg?stp=dst-jpg_tt6&cstp=mx1040x870&ctp=s590x590&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeE2Dz73ybl7QHlYV2I0TY2TOOYvPosvI1E45i8-iy8jUWhudm-Y2mcibeyY8vNyvLGekK3sQb6deaVkykNvTpX3&_nc_ohc=xPn4u5YHLJQQ7kNvwFaMTtM&_nc_oc=AdrnbR2yexB0-SE9JyAiZm33VmgRWQTq-qFcze48KSa1FA_jfSwaFFs_D-RuYj8RiHU&_nc_zt=23&_nc_ht=scontent.fcoo4-1.fna&_nc_gid=UnOd8hsYOMYYyAeuqpiJFw&_nc_ss=7b2a8&oh=00_AQB7aLwXynRCn4DqPfZbZTL--0_cjNxm8yPXpBfkIePQsg&oe=6A700BC9'
 ];
 
 const GallerySection = () => {

@@ -58,7 +58,7 @@ const Footer = () => {
               <li><Link to="/offres-emploi" className="hover:text-imardos-orange transition-colors">Offres d'emploi</Link></li>
               <li><Link to="/evenements" className="hover:text-imardos-orange transition-colors">Évènements</Link></li>
               <li><Link to="/galerie" className="hover:text-imardos-orange transition-colors">Galerie photos</Link></li>
-              <li><Link to="/avis" className="hover:text-imardos-orange transition-colors">Résultats des avis</Link></li>
+              <li><Link to="/results" className="hover:text-imardos-orange transition-colors">Résultats des offres</Link></li>
             </ul>
           </div>
 
