@@ -48,7 +48,7 @@ const Contact = () => {
             {/* --- COLONNE DE GAUCHE (Informations) - 2/5 de large --- */}
             <div className="lg:col-span-2 bg-imardos-blue text-white p-8 md:p-12 relative overflow-hidden">
               <div className="relative z-10">
-                <h2 className="text-2xl font-bold mb-6">Informations</h2>
+                <h2 className="text-2xl font-bold mb-6 text-white">Informations</h2>
                 <p className="text-imardos-light-blue mb-8 text-sm">
                   Nous sommes disponibles pour répondre à toutes vos questions. Rejoignez-nous dans notre mission.
                 </p>

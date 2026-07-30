@@ -18,7 +18,7 @@ const About = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">À propos de nous</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">À propos de nous</h1>
           <p className="text-imardos-light-blue text-lg max-w-2xl">
             Découvrez qui nous sommes, notre mission, nos valeurs et notre engagement pour le développement communautaire.
           </p>
