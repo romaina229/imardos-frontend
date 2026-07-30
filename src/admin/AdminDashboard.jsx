@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine } from 'lucide-react';
+import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine } from 'lucide-react';
 import { apiClient } from '../api/config';
-import { FileText } from 'lucide-react';
 
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('actions');
@@ -21,6 +20,7 @@ const AdminDashboard = ({ onLogout }) => {
   const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalTab, setModalTab] = useState('');
+  const [contacts, setContacts] = useState([]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,6 +37,7 @@ const AdminDashboard = ({ onLogout }) => {
       else if (tab === 'gallery') { res = await apiClient.get('/galleries'); setGallery(res.data); }
       else if (tab === 'job-results') { res = await apiClient.get('/job-results'); setJobResults(res.data); }
       else if (tab === 'blogs') { res = await apiClient.get('/blogs'); setBlogs(res.data); }
+      else if (tab === 'contacts') { res = await apiClient.get('/contacts'); setContacts(res.data);}
     } catch (error) {
       console.error("Erreur de chargement:", error);
     } finally {
@@ -116,6 +117,7 @@ const AdminDashboard = ({ onLogout }) => {
       case 'gallery': return <TabContent title="Galerie photos" data={gallery} columns={['Image','Titre','Catégorie']} keys={['image','title','category']} isGallery onAdd={() => openCreateModal('gallery')} onEdit={(item) => openEditModal('gallery', item)} onDelete={(id) => handleDelete('gallery', id)} />;
       case 'job-results': return (<TabContent title="Résultats des offres" data={jobResults} columns={['Titre', 'Offre (Job)', 'Contenu des résultats', 'Statut']} keys={['name', 'job_title', 'result_content', 'status']} onAdd={() => openCreateModal('job-results')} onEdit={(item) => openEditModal('job-results', item)} onDelete={(id) => handleDelete('job-results', id)} />);
       case 'blogs': return <TabContent title="Blog" data={blogs} columns={['Image','Titre','Catégorie','Auteur']} keys={['image','title','category','author']} isGallery onAdd={() => openCreateModal('blogs')} onEdit={(item) => openEditModal('blogs', item)} onDelete={(id) => handleDelete('blogs', id)} />;
+      case 'contacts': return (<TabContent title="Messages reçus" data={contacts} columns={['Nom', 'Email', 'Sujet', 'Message', 'Reçu le']} keys={['name', 'email', 'subject', 'message', 'created_at']} onAdd={null} onEdit={null} onDelete={null} />);
       default: return null;
     }
   };
@@ -135,6 +137,7 @@ const AdminDashboard = ({ onLogout }) => {
           <TabButton icon={<ImageIcon size={18} />} label="Galerie photos" tab="gallery" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<FileText size={18} />} label="Résultats des offres" tab="job-results" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<PenLine size={18} />} label="Blog" tab="blogs" activeTab={activeTab} setActiveTab={setActiveTab} />
+          <TabButton icon={<Phone size={18} />} label="Messages contact" tab="contacts" activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
 
@@ -249,11 +252,38 @@ const Input = ({ label, name, required, type = 'text', value, onChange }) => (
   <div><label className="block text-sm font-medium text-gray-700 mb-1">{label} {required && '*'}</label><input type={type} name={name} value={value || ''} onChange={onChange} required={required} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition" /></div>
 );
 const TabContent = ({ title, data, columns, keys, isGallery = false, onAdd, onEdit, onDelete }) => (
-  <div><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-imardos-blue">{title}</h2><button onClick={onAdd} className="bg-imardos-orange hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md"><Plus size={18} /> Ajouter</button></div>
+  <div>
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold text-imardos-blue">{title}</h2>
+      {onAdd && ( <button onClick={onAdd} className="bg-imardos-orange hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md"><Plus size={18} /> Ajouter</button> )}
+    </div>
     {data.length === 0 ? <div className="text-center py-12 bg-white rounded-xl shadow-sm text-gray-500">Aucun élément trouvé dans la base de données.</div> : 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden"><table className="w-full text-left"><thead className="bg-gray-100 text-gray-600 text-sm font-medium"><tr>{columns.map((col, i) => <th key={i} className="px-6 py-4">{col}</th>)}<th className="px-6 py-4 text-right">Actions</th></tr></thead><tbody className="divide-y divide-gray-200">
-        {data.map((item, idx) => <tr key={idx} className="hover:bg-gray-50 transition-colors">{keys.map((key, i) => <td key={i} className="px-6 py-4 text-sm text-gray-700">{isGallery && key === 'image' ? <img src={item[key]} alt="Thumb" className="w-12 h-12 object-cover rounded-md border border-gray-200" /> : item[key]}</td>)}<td className="px-6 py-4 flex justify-end gap-2"><button onClick={() => onEdit(item)} className="text-imardos-blue hover:text-blue-800 p-1"><Edit size={18} /></button><button onClick={() => onDelete(item.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={18} /></button></td></tr>)}
-      </tbody></table></div>}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-gray-100 text-gray-600 text-sm font-medium">
+            <tr>
+              {columns.map((col, i) => <th key={i} className="px-6 py-4">{col}</th>)}
+              <th className="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data.map((item, idx) => (
+              <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                {keys.map((key, i) => (
+                  <td key={i} className="px-6 py-4 text-sm text-gray-700">
+                    {isGallery && key === 'image' ? <img src={item[key]} alt="Thumb" className="w-12 h-12 object-cover rounded-md border border-gray-200" /> : item[key]}
+                  </td>
+                ))}
+                <td className="px-6 py-4 flex justify-end gap-2">
+                  {onEdit && ( <button onClick={() => onEdit(item)} className="text-imardos-blue hover:text-blue-800 p-1"><Edit size={18} /></button> )}
+                  {onDelete && ( <button onClick={() => onDelete(item.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={18} /></button> )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    }
   </div>
 );
 const getLabel = (tab) => { if (tab === 'actions') return "une action"; if (tab === 'jobs') return "une offre d'emploi"; if (tab === 'events') return "un évènement"; if (tab === 'gallery') return "une photo"; if (tab === 'job-results') return "un avis"; if (tab === 'blogs') return "un article de blog"; return "un élément"; };
