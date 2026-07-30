@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { FaFacebook, FaInstagram,  FaLinkedin,  FaYoutube, FaWhatsapp,} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { apiClient } from '../api/config';
 
 const Contact = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
