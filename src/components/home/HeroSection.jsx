@@ -85,7 +85,7 @@ const HeroSection = () => {
       </div>
 
       {/* Barre de statistiques flottante (Bas du Hero) */}
-      <div className="relative z-10 container mx-auto px-4 transform translate-y-12">
+      <div className="relative z-10 container mx-auto px-4 mb-5 transform translate-y-12">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
