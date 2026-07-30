@@ -3,29 +3,30 @@ import { useForm } from 'react-hook-form';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { FaFacebook, FaInstagram,  FaLinkedin,  FaYoutube, FaWhatsapp,} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-//import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const Contact = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = (data) => {
-    console.log('Données du formulaire:', data);
-    setIsSubmitted(true);
-    // Ici, vous connecterez plus tard un service email (ex: EmailJS ou un backend Laravel)
-    setTimeout(() => setIsSubmitted(false), 5000);
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      await apiClient.post('/contacts', data);
+      
+      setIsSubmitted(true);
+      // On réinitialise le formulaire
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setIsSubmitting(false);
+      }, 5000);
+      
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message:", error);
+      alert("Une erreur est survenue. Veuillez réessayer plus tard.");
+      setIsSubmitting(false);
+    }
   };
-
-  // Configuration de la carte (Abomey-Calavi, Bénin)
-  //const mapContainerStyle = {
-  //  width: '100%',
-  //  height: '300px',
- //   borderRadius: '12px'
- // };
- // const center = {
- //   lat: 6.4485,
- //   lng: 2.3587
- // };
 
   return (
     <div className="bg-gray-50 min-h-screen pt-10 pb-20">
@@ -151,9 +152,10 @@ const Contact = () => {
 
                 <button 
                   type="submit" 
-                  className="btn-primary w-full md:w-auto px-8 py-3"
+                  disabled={isSubmitting}
+                  className="btn-primary w-full md:w-auto px-8 py-3 flex items-center justify-center gap-2"
                 >
-                  Envoyer le message
+                {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
                 </button>
               </form>
 
