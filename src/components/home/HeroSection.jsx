@@ -1,6 +1,36 @@
 import { ArrowRight, Award, Users, MapPin, HeartHandshake } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+
+const Counter = ({ end, suffix = "" }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 2000; // 2 secondes
+    const increment = end / (duration / 30);
+
+    const timer = setInterval(() => {
+      start += increment;
+
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 30);
+
+    return () => clearInterval(timer);
+  }, [end]);
+
+  return (
+    <span className="text-2xl font-bold text-gray-800">
+      {count.toLocaleString("fr-FR")}{suffix}
+    </span>
+  );
+};
 
 const HeroSection = () => {
   return (
@@ -64,22 +94,22 @@ const HeroSection = () => {
         >
           <div className="flex flex-col items-center text-center border-r border-gray-100 last:border-0 md:last:border-0">
             <Award className="text-imardos-red w-8 h-8 mb-2" />
-            <span className="text-2xl font-bold text-gray-800">6+</span>
+            <span className="text-2xl font-bold text-gray-800"><Counter end={6} suffix="+" /></span>
             <span className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">Ans d'expérience</span>
           </div>
           <div className="flex flex-col items-center text-center border-r border-gray-100 last:border-0 md:last:border-0">
             <Users className="text-imardos-red w-8 h-8 mb-2" />
-            <span className="text-2xl font-bold text-gray-800">2 500+</span>
+            <span className="text-2xl font-bold text-gray-800"><Counter end={2500} suffix="+" /></span>
             <span className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">Bénéficiaires</span>
           </div>
           <div className="flex flex-col items-center text-center border-r border-gray-100 last:border-0 md:last:border-0">
             <MapPin className="text-imardos-red w-8 h-8 mb-2" />
-            <span className="text-2xl font-bold text-gray-800">25+</span>
+            <span className="text-2xl font-bold text-gray-800"><Counter end={25} suffix="+" /></span>
             <span className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">Localités</span>
           </div>
           <div className="flex flex-col items-center text-center">
             <HeartHandshake className="text-imardos-red w-8 h-8 mb-2" />
-            <span className="text-2xl font-bold text-gray-800">10+</span>
+            <span className="text-2xl font-bold text-gray-800"><Counter end={10} suffix="+" /></span>
             <span className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">Projets réalisés</span>
           </div>
         </motion.div>

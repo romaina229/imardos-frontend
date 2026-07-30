@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { FaFacebook, FaInstagram,  FaLinkedin,  FaYoutube, FaWhatsapp,} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+//import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const Contact = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -17,15 +17,15 @@ const Contact = () => {
   };
 
   // Configuration de la carte (Abomey-Calavi, Bénin)
-  const mapContainerStyle = {
-    width: '100%',
-    height: '300px',
-    borderRadius: '12px'
-  };
-  const center = {
-    lat: 6.4485,
-    lng: 2.3587
-  };
+  //const mapContainerStyle = {
+  //  width: '100%',
+  //  height: '300px',
+ //   borderRadius: '12px'
+ // };
+ // const center = {
+ //   lat: 6.4485,
+ //   lng: 2.3587
+ // };
 
   return (
     <div className="bg-gray-50 min-h-screen pt-10 pb-20">
@@ -64,7 +64,7 @@ const Contact = () => {
                     <Phone className="text-imardos-orange shrink-0" size={22} />
                     <div>
                       <p className="font-medium">Téléphone</p>
-                      <p className="text-sm text-imardos-light-blue">+229 00 00 00 00</p>
+                      <p className="text-sm text-imardos-light-blue">+229 01 40 15 24 43</p>
                     </div>
                   </div>
 
@@ -72,7 +72,7 @@ const Contact = () => {
                     <Mail className="text-imardos-orange shrink-0" size={22} />
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-sm text-imardos-light-blue">contact@imardos.org</p>
+                      <p className="text-sm text-imardos-light-blue">imardos@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -81,10 +81,10 @@ const Contact = () => {
                 <div className="mt-10">
                   <p className="font-medium mb-3">Suivez-nous</p>
                   <div className="flex gap-3">
-                    <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaFacebook size={18} /></a>
-                      <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaXTwitter size={18} /></a>
-                      <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaInstagram size={18} /></a>
-                      <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaYoutube size={18} /></a>
+                    <a href="https://www.facebook.com/profile.php?id=100080912787464" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaFacebook size={18} /></a>
+                    <a href="https://www.linkedin.com/company/imardos-ong" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaLinkedin size={18} /></a>
+                    <a href="https://www.instagram.com/imardos_ong/" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaInstagram size={18} /></a>
+                    <a href="https://youtu.be/6cXvOqmwiE4?si=X4OLT8LjoT3THjTo" className="bg-white/10 p-2 rounded-full hover:bg-imardos-orange transition-colors"><FaYoutube size={18} /></a>
                   </div>
                 </div>
               </div>
@@ -159,17 +159,26 @@ const Contact = () => {
 
               {/* Carte Google Maps interactive */}
               <div className="mt-10">
-                <p className="text-sm font-medium text-gray-700 mb-3">Retrouvez-nous sur la carte</p>
-                <LoadScript googleMapsApiKey="VOTRE_CLE_API_GOOGLE_MAPS"> {/* Vous mettrez votre clé ici plus tard */}
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={center}
-                    zoom={15}
-                  >
-                    <Marker position={center} />
-                  </GoogleMap>
-                </LoadScript>
-                <p className="text-xs text-gray-400 mt-2">* Pour activer la carte, vous devez insérer votre clé API Google Maps dans le code.</p>
+                <p className="text-sm font-medium text-gray-700 mb-3">
+                  Retrouvez-nous sur la carte
+                </p>
+
+                <div className="w-full h-[400px] rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <iframe
+                    title="Localisation IMARDOS - Tankpè, Abomey-Calavi"
+                    src="https://www.google.com/maps?q=Tankpè%2C%20Abomey-Calavi%2C%20Bénin&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+
+                <p className="text-xs text-gray-400 mt-2">
+                  IMARDOS — Tankpè, Abomey-Calavi, Bénin
+                </p>
               </div>
             </div>
           </div>

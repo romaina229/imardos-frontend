@@ -7,9 +7,10 @@ const projects = [
     title: 'Projet Santé Maternelle',
     location: 'Département du Mono',
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop',
-    progress: 75,
+    progress: 100,
     color: 'bg-imardos-blue',
     textColor: 'text-imardos-blue',
+    description: 'Ce projet vise à améliorer la santé maternelle et infantile dans les zones rurales du Bénin. Nous fournissons des soins prénatals, des formations pour les sages-femmes et des campagnes de sensibilisation pour réduire la mortalité maternelle et infantile.',
   },
   {
     id: 2,
@@ -19,16 +20,17 @@ const projects = [
     progress: 100,
     color: 'bg-imardos-red',
     textColor: 'text-imardos-red',
-    description: 'Ce projet vise à fournir un accès à l\'éducation de qualité pour tous les enfants, en particulier dans les zones rurales et défavorisées. Nous construisons des écoles, formons des enseignants et fournissons du matériel éducatif pour garantir que chaque enfant ait la chance d\'apprendre et de réussir.',
+    description: 'Ce projet vise à fournir un accès à l\'éducation de qualité pour tous les enfants, en particulier dans les zones rurales et défavorisées. Nous formons des enseignants et fournissons du matériel éducatif pour garantir que chaque enfant ait la chance d\'apprendre et de réussir.',
   },
   {
     id: 3,
     title: 'Autonomisation des Femmes',
     location: 'Département du Borgou',
     image: 'https://scontent.fcoo4-1.fna.fbcdn.net/v/t39.30808-6/743373841_1070303469010069_2937584629765229698_n.jpg?stp=dst-jpg_tt6&cstp=mx1040x468&ctp=s1040x468&_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHmWFHkTtX4WAwaGjd_MkRGKTxXeffs4rkpPFd59-ziudgx48RnDBCoacVaQ2_KvoONbSNP7LSspsPal6u0y5b3&_nc_ohc=uLWCPUwFvogQ7kNvwHo3GMV&_nc_oc=AdpwthQP6qaxF9PRPL1qR4n5B33EjgITurSHT_sEm74pxZJak-5ABdd-KSKZsGp-8BI&_nc_zt=23&_nc_ht=scontent.fcoo4-1.fna&_nc_gid=cXji751Yn6R150uTqcNxWw&_nc_ss=7b2a8&oh=00_AQBxLd-RtBc1uk9Plnm9xKQc_jwD5zmjbTOi39mT29Ei0Q&oe=6A6FE56E',
-    progress: 95,
+    progress: 100,
     color: 'bg-imardos-green',
     textColor: 'text-imardos-green',
+    description: 'Ce projet vise à autonomiser les femmes en leur fournissant des compétences, des ressources et des opportunités pour améliorer leur vie et celle de leurs familles. Nous organisons des ateliers de formation, des programmes de mentorat et des initiatives de microfinance pour aider les femmes à devenir financièrement indépendantes et à jouer un rôle actif dans le développement de leur communauté.',
   },
 ];
 
@@ -77,6 +79,13 @@ const ProjectsSection = () => {
                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
                   <MapPin size={16} className="text-imardos-orange" />
                   <span>{project.location}</span>
+                </div>
+
+                {/* Description du projet */}
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {project.description}
+                  </p>
                 </div>
 
                 {/* Barre de progression */}

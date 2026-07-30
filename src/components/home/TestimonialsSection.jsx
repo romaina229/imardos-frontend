@@ -10,19 +10,19 @@ const testimonials = [
   {
     name: 'Mme. Aïssa Traoré',
     role: 'Bénéficiaire - Santé Maternelle',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTleR9fSD2d46U_AJj6drXGBTULFrOGjTCF1ECdePG5uGaUykyPzM_c6vM&s=10',
     text: 'Grâce à IMARDOS, j\'ai pu accoucher dans de bonnes conditions. Leur accompagnement a été d\'une aide précieuse pour ma famille.'
   },
   {
     name: 'Jean-Baptiste K.',
     role: 'Enseignant - Partenaire Éducation',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200',
+    image: 'https://legrandfrere.africa/wp-content/uploads/d363f3c7-419b-4296-bf1c-5895e21801b2-768x432.png.webp',
     text: 'Le programme d\'alphabétisation d\'IMARDOS a transformé notre village. Aujourd\'hui, nos enfants ont accès à une éducation de qualité.'
   },
   {
     name: 'Fati Bouraïma',
     role: 'Leader Communautaire - Autonomisation',
-    image: 'https://images.unsplash.com/photo-1488716820095-cbe80883c496?auto=format&fit=crop&q=80&w=200&h=200',
+    image: 'https://img.magnific.com/photos-gratuite/contenu-femme-affaires-ethnique-au-bureau-travail_1098-22009.jpg?semt=ais_hybrid&w=740&q=80',
     text: 'Les formations offertes par IMARDOS m\'ont permis de créer ma propre petite entreprise. Je suis désormais financièrement indépendante.'
   }
 ];

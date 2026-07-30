@@ -89,7 +89,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="border-t border-white/20 pt-6 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} IMARDOS ONG. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} IMARDOS ONG . Tous droits réservés.</p>
         </div>
       </div>
     </footer>
