@@ -6,7 +6,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { apiClient } from '../api/config';
 
 const Contact = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -16,7 +16,7 @@ const Contact = () => {
       await apiClient.post('/contacts', data);
       
       setIsSubmitted(true);
-      // On réinitialise le formulaire
+      reset(); // On réinitialise le formulaire
       setTimeout(() => {
         setIsSubmitted(false);
         setIsSubmitting(false);

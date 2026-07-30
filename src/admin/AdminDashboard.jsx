@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine } from 'lucide-react';
+import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, Check } from 'lucide-react';
 import { apiClient } from '../api/config';
+import { formatDate } from '../utils/dateFormatter';
 
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('actions');
@@ -108,6 +109,26 @@ const AdminDashboard = ({ onLogout }) => {
     }
   };
 
+  const handleMarkAsRead = async (item) => {
+    try {
+      await apiClient.put(`/contacts/${item.id}`);
+      // On recharge la liste pour voir le changement
+      fetchData('contacts');
+    } catch (error) {
+      //console.error("Erreur lors du marquage", error);
+    }
+  };
+
+  const handleDeleteContact = async (id) => {
+    if (!window.confirm("Voulez-vous supprimer ce message ?")) return;
+    try {
+      await apiClient.delete(`/contacts/${id}`);
+      fetchData('contacts');
+    } catch (error) {
+      //console.error("Erreur lors de la suppression", error);
+    }
+  };
+
   // --- RENDER DES ONGLETS ---
   const renderTabContent = () => {
     switch(activeTab) {
@@ -117,7 +138,7 @@ const AdminDashboard = ({ onLogout }) => {
       case 'gallery': return <TabContent title="Galerie photos" data={gallery} columns={['Image','Titre','Catégorie']} keys={['image','title','category']} isGallery onAdd={() => openCreateModal('gallery')} onEdit={(item) => openEditModal('gallery', item)} onDelete={(id) => handleDelete('gallery', id)} />;
       case 'job-results': return (<TabContent title="Résultats des offres" data={jobResults} columns={['Titre', 'Offre (Job)', 'Contenu des résultats', 'Statut']} keys={['name', 'job_title', 'result_content', 'status']} onAdd={() => openCreateModal('job-results')} onEdit={(item) => openEditModal('job-results', item)} onDelete={(id) => handleDelete('job-results', id)} />);
       case 'blogs': return <TabContent title="Blog" data={blogs} columns={['Image','Titre','Catégorie','Auteur']} keys={['image','title','category','author']} isGallery onAdd={() => openCreateModal('blogs')} onEdit={(item) => openEditModal('blogs', item)} onDelete={(id) => handleDelete('blogs', id)} />;
-      case 'contacts': return (<TabContent title="Messages reçus" data={contacts} columns={['Nom', 'Email', 'Sujet', 'Message', 'Reçu le']} keys={['name', 'email', 'subject', 'message', 'created_at']} onAdd={null} onEdit={null} onDelete={null} />);
+      case 'contacts': return (<TabContent title="Messages reçus" data={contacts} columns={['Nom', 'Email', 'Sujet', 'Message', 'Statut', 'Reçu le']} keys={['name', 'email', 'subject', 'message', 'is_read', 'created_at']} formatDateColumn="created_at" isContactTab={true} onAdd={null} onEdit={(item) => handleMarkAsRead(item)} onDelete={(id) => handleDeleteContact(id)} />);
       default: return null;
     }
   };
@@ -251,7 +272,7 @@ const TabButton = ({ icon, label, tab, activeTab, setActiveTab }) => (
 const Input = ({ label, name, required, type = 'text', value, onChange }) => (
   <div><label className="block text-sm font-medium text-gray-700 mb-1">{label} {required && '*'}</label><input type={type} name={name} value={value || ''} onChange={onChange} required={required} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition" /></div>
 );
-const TabContent = ({ title, data, columns, keys, isGallery = false, onAdd, onEdit, onDelete }) => (
+const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateColumn=null, onAdd, onEdit, onDelete }) => (
   <div>
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-2xl font-bold text-imardos-blue">{title}</h2>
@@ -269,11 +290,14 @@ const TabContent = ({ title, data, columns, keys, isGallery = false, onAdd, onEd
           <tbody className="divide-y divide-gray-200">
             {data.map((item, idx) => (
               <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                {keys.map((key, i) => (
-                  <td key={i} className="px-6 py-4 text-sm text-gray-700">
-                    {isGallery && key === 'image' ? <img src={item[key]} alt="Thumb" className="w-12 h-12 object-cover rounded-md border border-gray-200" /> : item[key]}
-                  </td>
-                ))}
+                {keys.map((key, i) => {
+                const value = (formatDateColumn && key === formatDateColumn) 
+                  ? formatDate(item[key]) 
+                  : item[key];
+                return <td key={i} className="px-6 py-4 text-sm text-gray-700">
+                  {isGallery && key === 'image' ? <img src={item[key]} alt="Thumb" className="w-12 h-12 object-cover rounded-md border border-gray-200" /> : (key === 'is_read' ? (item[key] ? <span className="text-green-600 font-medium">Lu</span> : <span className="text-imardos-orange font-medium">Non lu</span>) : value )}
+                </td>
+              })}
                 <td className="px-6 py-4 flex justify-end gap-2">
                   {onEdit && ( <button onClick={() => onEdit(item)} className="text-imardos-blue hover:text-blue-800 p-1"><Edit size={18} /></button> )}
                   {onDelete && ( <button onClick={() => onDelete(item.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={18} /></button> )}
