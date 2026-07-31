@@ -59,13 +59,22 @@ const AdminDashboard = ({ onLogout }) => {
   };
 
   // --- CRUD VERS LARAVEL ---
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      // 1. Nettoyer les données pour les modules qui ont un champ image
+      let cleanData = { ...formData };
+
+      if (modalTab === 'actions' || modalTab === 'gallery' || modalTab === 'blogs') {
+        // Si le champ image est une chaîne vide ou seulement des espaces, on le transforme en null
+        cleanData.image = (cleanData.image && cleanData.image.trim() !== '') ? cleanData.image.trim() : null;
+      }
+
+      // 2. Exécution des requêtes CRUD
       if (modalTab === 'actions') {
-        if (editingItem) await apiClient.put(`/actions/${editingItem.id}`, formData);
-        else await apiClient.post('/actions', formData);
+        if (editingItem) await apiClient.put(`/actions/${editingItem.id}`, cleanData);
+        else await apiClient.post('/actions', cleanData);
       } else if (modalTab === 'jobs') {
         if (editingItem) await apiClient.put(`/jobse/${editingItem.id}`, formData);
         else await apiClient.post('/jobse', formData);
@@ -73,15 +82,16 @@ const AdminDashboard = ({ onLogout }) => {
         if (editingItem) await apiClient.put(`/events/${editingItem.id}`, formData);
         else await apiClient.post('/events', formData);
       } else if (modalTab === 'gallery') {
-        if (editingItem) await apiClient.put(`/galleries/${editingItem.id}`, formData);
-        else await apiClient.post('/galleries', formData);
+        if (editingItem) await apiClient.put(`/galleries/${editingItem.id}`, cleanData);
+        else await apiClient.post('/galleries', cleanData);
       } else if (modalTab === 'job-results') {
         if (editingItem) await apiClient.put(`/job-results/${editingItem.id}`, formData);
         else await apiClient.post('/job-results', formData);
       } else if (modalTab === 'blogs') {
-        if (editingItem) await apiClient.put(`/blogs/${editingItem.id}`, formData);
-        else await apiClient.post('/blogs', formData);
+        if (editingItem) await apiClient.put(`/blogs/${editingItem.id}`, cleanData);
+        else await apiClient.post('/blogs', cleanData);
       }
+      
       setIsModalOpen(false);
       fetchData(modalTab);
       alert("Opération réussie !");
