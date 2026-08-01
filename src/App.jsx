@@ -22,6 +22,7 @@ import Gallery from './pages/Gallery';
 import JobResults from './pages/JobResults';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import Resources from './pages/Resources'
 
 // Remonte en haut de page à chaque changement de route
 const ScrollToTop = () => {
@@ -69,6 +70,7 @@ function App() {
             <Route path="/results" element={<JobResults />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogPost />} />
+            <Route path="/ressources" element={<Resources />} />
             {/* -------------------------------------------------- */}
 
             <Route 

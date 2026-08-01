@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, Check } from 'lucide-react';
+import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, FolderOpen, Check } from 'lucide-react';
 import { apiClient } from '../api/config';
 import { formatDate } from '../utils/dateFormatter';
 
@@ -14,6 +14,7 @@ const AdminDashboard = ({ onLogout }) => {
   const [jobResults, setJobResults] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [resources, setResources] = useState([]);
 
   // État du formulaire
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +40,7 @@ const AdminDashboard = ({ onLogout }) => {
       else if (tab === 'job-results') { res = await apiClient.get('/job-results'); setJobResults(res.data); }
       else if (tab === 'blogs') { res = await apiClient.get('/blogs'); setBlogs(res.data); }
       else if (tab === 'contacts') { res = await apiClient.get('/contacts'); setContacts(res.data);}
+      else if (tab === 'resources') { res = await apiClient.get('/resources'); setResources(res.data); }
     } catch (error) {
       console.error("Erreur de chargement:", error);
     } finally {
@@ -90,6 +92,9 @@ const AdminDashboard = ({ onLogout }) => {
       } else if (modalTab === 'blogs') {
         if (editingItem) await apiClient.put(`/blogs/${editingItem.id}`, cleanData);
         else await apiClient.post('/blogs', cleanData);
+      } else if (modalTab === 'resources') {
+        if (editingItem) await apiClient.put(`/resources/${editingItem.id}`, formData);
+        else await apiClient.post('/resources', formData);
       }
       
       setIsModalOpen(false);
@@ -112,6 +117,7 @@ const AdminDashboard = ({ onLogout }) => {
       else if (tab === 'gallery') await apiClient.delete(`/galleries/${id}`);
       else if (tab === 'job-results') await apiClient.delete(`/job-results/${id}`);
       else if (tab === 'blogs') await apiClient.delete(`/blogs/${id}`);
+      else if (tab === 'resources') await apiClient.delete(`/resources/${id}`);
       fetchData(tab);
     } catch (error) {
       console.error(error);
@@ -149,6 +155,7 @@ const AdminDashboard = ({ onLogout }) => {
       case 'job-results': return (<TabContent title="Résultats des offres" data={jobResults} columns={['Titre', 'Offre (Job)', 'Contenu des résultats', 'Statut']} keys={['name', 'job_title', 'result_content', 'status']} onAdd={() => openCreateModal('job-results')} onEdit={(item) => openEditModal('job-results', item)} onDelete={(id) => handleDelete('job-results', id)} />);
       case 'blogs': return <TabContent title="Blog" data={blogs} columns={['Image','Titre','Catégorie','Auteur']} keys={['image','title','category','author']} isGallery onAdd={() => openCreateModal('blogs')} onEdit={(item) => openEditModal('blogs', item)} onDelete={(id) => handleDelete('blogs', id)} />;
       case 'contacts': return (<TabContent title="Messages reçus" data={contacts} columns={['Nom', 'Email', 'Sujet', 'Message', 'Statut', 'Reçu le']} keys={['name', 'email', 'subject', 'message', 'is_read', 'created_at']} formatDateColumn="created_at" isContactTab={true} onAdd={null} onEdit={(item) => handleMarkAsRead(item)} onDelete={(id) => handleDeleteContact(id)} />);
+      case 'resources': return (<TabContent title="Ressources et documents" data={resources} columns={['Titre', 'Catégorie', 'Description', 'Taille', 'Lien']} keys={['title', 'category', 'description', 'file_size', 'file_url']} onAdd={() => openCreateModal('resources')} onEdit={(item) => openEditModal('resources', item)} onDelete={(id) => handleDelete('resources', id)} />);
       default: return null;
     }
   };
@@ -165,9 +172,10 @@ const AdminDashboard = ({ onLogout }) => {
           <TabButton icon={<HeartHandshake size={18} />} label="Nos actions" tab="actions" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<Briefcase size={18} />} label="Offres d'emploi" tab="jobs" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<Calendar size={18} />} label="Évènements" tab="events" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<ImageIcon size={18} />} label="Galerie photos" tab="gallery" activeTab={activeTab} setActiveTab={setActiveTab} />
+          <TabButton icon={<ImageIcon size={18} />} label="Galerie" tab="gallery" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<FileText size={18} />} label="Résultats des offres" tab="job-results" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<PenLine size={18} />} label="Blog" tab="blogs" activeTab={activeTab} setActiveTab={setActiveTab} />
+          <TabButton icon={<FolderOpen size={18} />} label="Ressources" tab="resources" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<Phone size={18} />} label="Messages contact" tab="contacts" activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
@@ -223,6 +231,22 @@ const AdminDashboard = ({ onLogout }) => {
               {/* CHAMPS BLOG */}
               {modalTab === 'blogs' && (
                 <><Input label="Titre de l'article" name="title" value={formData.title} onChange={handleChange} required /><div className="grid grid-cols-2 gap-4"><div><label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label><select name="category" value={formData.category || 'Actualités'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="Actualités">Actualités</option><option value="Articles">Articles</option><option value="Communiqués">Communiqués</option></select></div><Input label="Auteur" name="author" value={formData.author} onChange={handleChange} required /></div><Input label="Date (ex: 15 Septembre 2024)" name="date" value={formData.date} onChange={handleChange} required /><Input label="Lien de l'image (URL)" name="image" value={formData.image} onChange={handleChange} /><div><label className="block text-sm font-medium text-gray-700 mb-1">Résumé (Excerpt)</label><textarea name="excerpt" value={formData.excerpt || ''} onChange={handleChange} rows="2" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Contenu (HTML autorisé)</label><textarea name="content" value={formData.content || ''} onChange={handleChange} rows="4" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div></>
+              )}
+
+              {/* CHAMPS RESSOURCES */}
+              {modalTab === 'resources' && (
+                <>
+                  <Input label="Titre du document" name="title" value={formData.title} onChange={handleChange} required />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input label="Catégorie (ex: Rapport annuel)" name="category" value={formData.category} onChange={handleChange} required />
+                    <Input label="Taille du fichier (ex: 2.4 Mo)" name="file_size" value={formData.file_size} onChange={handleChange} />
+                  </div>
+                  <Input label="Lien de téléchargement (URL du PDF)" name="file_url" value={formData.file_url} onChange={handleChange} required />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description (optionnel)</label>
+                    <textarea name="description" value={formData.description || ''} onChange={handleChange} rows="2" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea>
+                  </div>
+                </>
               )}
 
               {/* CHAMPS AVIS (LIÉS AUX OFFRES D'EMPLOI) */}
@@ -320,6 +344,6 @@ const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateC
     }
   </div>
 );
-const getLabel = (tab) => { if (tab === 'actions') return "une action"; if (tab === 'jobs') return "une offre d'emploi"; if (tab === 'events') return "un évènement"; if (tab === 'gallery') return "une photo"; if (tab === 'job-results') return "un avis"; if (tab === 'blogs') return "un article de blog"; return "un élément"; };
+const getLabel = (tab) => { if (tab === 'actions') return "une action"; if (tab === 'jobs') return "une offre d'emploi"; if (tab === 'events') return "un évènement"; if (tab === 'gallery') return "une photo"; if (tab === 'job-results') return "un avis"; if (tab === 'blogs') return "un article de blog"; return "un élément"; if (tab === 'resources') return "une ressource"; };
 
 export default AdminDashboard;

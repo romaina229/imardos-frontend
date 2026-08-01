@@ -23,7 +23,7 @@ const Navbar = () => {
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <div className="h-35 w-35 rounded-full bg-white shadow-md overflow-hidden flex items-center justify-center">
+          <div className="h-30 w-30 rounded-full bg-imardos-light-blue shadow-md overflow-hidden flex items-center justify-center">
             <img
               src="/files/IMARDOS-logo-principal.png"
               alt="IMARDOS ONG"
