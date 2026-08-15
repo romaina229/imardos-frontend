@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, FolderOpen, Check } from 'lucide-react';
 import { apiClient } from '../api/config';
 import { formatDate } from '../utils/dateFormatter';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../api/lib/supabase';
 
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('actions');
