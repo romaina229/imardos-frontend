@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, FolderOpen, Check } from 'lucide-react';
 import { apiClient } from '../api/config';
 import { formatDate } from '../utils/dateFormatter';
+import { supabase } from '../lib/supabase';
 
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('actions');
@@ -20,12 +21,27 @@ const AdminDashboard = ({ onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [galleryImageFile, setGalleryImageFile] = useState(null);
+  const [galleryImagePreview, setGalleryImagePreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalTab, setModalTab] = useState('');
   const [contacts, setContacts] = useState([]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const handleGalleryImageChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner une image valide.');
+      return;
+    }
+
+    setGalleryImageFile(file);
+    setGalleryImagePreview(URL.createObjectURL(file));
   };
 
   // --- CHARGEMENT DES DONNÉES ---
@@ -54,10 +70,10 @@ const AdminDashboard = ({ onLogout }) => {
 
   // --- MODALE ---
   const openCreateModal = (tab) => {
-    setModalTab(tab); setEditingItem(null); setFormData({}); setIsModalOpen(true);
+    setModalTab(tab); setEditingItem(null);setGalleryImageFile(null); setGalleryImagePreview(''); setFormData({}); setIsModalOpen(true);
   };
   const openEditModal = (tab, item) => {
-    setModalTab(tab); setEditingItem(item); setFormData(item); setIsModalOpen(true);
+    setModalTab(tab); setEditingItem(item); setGalleryImageFile(null); setGalleryImagePreview('');setFormData(item); setIsModalOpen(true);
   };
 
   // --- CRUD VERS LARAVEL ---
@@ -71,6 +87,30 @@ const AdminDashboard = ({ onLogout }) => {
       if (modalTab === 'actions' || modalTab === 'gallery' || modalTab === 'blogs') {
         // Si le champ image est une chaîne vide ou seulement des espaces, on le transforme en null
         cleanData.image = (cleanData.image && cleanData.image.trim() !== '') ? cleanData.image.trim() : null;
+      }
+
+      // Upload de l'image uniquement pour la galerie
+      if (modalTab === 'gallery' && galleryImageFile) {
+        const fileExt = galleryImageFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `gallery/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('gallery')
+          .upload(filePath, galleryImageFile, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('gallery')
+          .getPublicUrl(filePath);
+
+        cleanData.image = publicUrlData.publicUrl;
       }
 
       // 2. Exécution des requêtes CRUD
@@ -203,8 +243,33 @@ const AdminDashboard = ({ onLogout }) => {
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="description" value={formData.description || ''} onChange={handleChange} rows="3" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div>
                   <div className="grid grid-cols-2 gap-4">
                     <div><label className="block text-sm font-medium text-gray-700 mb-1">Statut</label><select name="status" value={formData.status || 'En cours'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="En cours">En cours</option><option value="Terminé">Terminé</option><option value="À venir">À venir</option></select></div>
-                    <Input label="Lien de l'image (URL)" name="image" value={formData.image} onChange={handleChange} />
-                  </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Image *
+                    </label>
+
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleGalleryImageChange}
+                      required={!editingItem}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                    />
+
+                    {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
+                        <img
+                          src={galleryImagePreview}
+                          alt="Aperçu"
+                          className="w-full max-h-64 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                    )}
+
+                    {editingItem && !galleryImageFile && formData.image && (
+                      <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
+                        <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                      </div>
+                    )}
+                    </div>
                 </>
               )}
 
@@ -225,12 +290,65 @@ const AdminDashboard = ({ onLogout }) => {
 
               {/* CHAMPS GALERIE */}
               {modalTab === 'gallery' && (
-                <><Input label="Titre" name="title" value={formData.title} onChange={handleChange} required /><Input label="Catégorie" name="category" value={formData.category} onChange={handleChange} required /><Input label="Lien de l'image (URL)" name="image" value={formData.image} onChange={handleChange} required /></>
+                <><Input label="Titre" name="title" value={formData.title} onChange={handleChange} required /><Input label="Catégorie" name="category" value={formData.category} onChange={handleChange} required /><div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image *
+                </label>
+
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleGalleryImageChange}
+                  required={!editingItem}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                />
+
+                {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
+                    <img
+                      src={galleryImagePreview}
+                      alt="Aperçu"
+                      className="w-full max-h-64 object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
+
+                {editingItem && !galleryImageFile && formData.image && (
+                  <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
+                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                  </div>
+                )}
+                </div></>
               )}
 
               {/* CHAMPS BLOG */}
               {modalTab === 'blogs' && (
-                <><Input label="Titre de l'article" name="title" value={formData.title} onChange={handleChange} required /><div className="grid grid-cols-2 gap-4"><div><label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label><select name="category" value={formData.category || 'Actualités'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="Actualités">Actualités</option><option value="Articles">Articles</option><option value="Communiqués">Communiqués</option></select></div><Input label="Auteur" name="author" value={formData.author} onChange={handleChange} required /></div><Input label="Date (ex: 15 Septembre 2024)" name="date" value={formData.date} onChange={handleChange} required /><Input label="Lien de l'image (URL)" name="image" value={formData.image} onChange={handleChange} /><div><label className="block text-sm font-medium text-gray-700 mb-1">Résumé (Excerpt)</label><textarea name="excerpt" value={formData.excerpt || ''} onChange={handleChange} rows="2" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Contenu (HTML autorisé)</label><textarea name="content" value={formData.content || ''} onChange={handleChange} rows="4" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div></>
+                <><Input label="Titre de l'article" name="title" value={formData.title} onChange={handleChange} required /><div className="grid grid-cols-2 gap-4"><div><label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label><select name="category" value={formData.category || 'Actualités'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="Actualités">Actualités</option><option value="Articles">Articles</option><option value="Communiqués">Communiqués</option></select></div><Input label="Auteur" name="author" value={formData.author} onChange={handleChange} required /></div><Input label="Date (ex: 15 Septembre 2024)" name="date" value={formData.date} onChange={handleChange} required /><label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image *
+                </label>
+
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleGalleryImageChange}
+                  required={!editingItem}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                />
+
+                {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
+                    <img
+                      src={galleryImagePreview}
+                      alt="Aperçu"
+                      className="w-full max-h-64 object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
+
+                {editingItem && !galleryImageFile && formData.image && (
+                  <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
+                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                  </div>
+                )}
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Résumé (Excerpt)</label><textarea name="excerpt" value={formData.excerpt || ''} onChange={handleChange} rows="2" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Contenu (HTML autorisé)</label><textarea name="content" value={formData.content || ''} onChange={handleChange} rows="4" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div></>
               )}
 
               {/* CHAMPS RESSOURCES */}
