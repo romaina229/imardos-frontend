@@ -89,11 +89,13 @@ const AdminDashboard = ({ onLogout }) => {
         cleanData.image = (cleanData.image && cleanData.image.trim() !== '') ? cleanData.image.trim() : null;
       }
 
-      // Upload de l'image uniquement pour la galerie
-      if (modalTab === 'gallery' && galleryImageFile) {
+      // Upload de l'image pour la galerie, les actions et le blog si un fichier a été sélectionné
+      if ((modalTab === 'gallery' || modalTab === 'actions' || modalTab === 'blogs') && galleryImageFile) {
         const fileExt = galleryImageFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `gallery/${fileName}`;
+        // utiliser un dossier distinct par type pour faciliter l'organisation
+        const folder = modalTab === 'gallery' ? 'gallery' : modalTab === 'actions' ? 'actions' : 'blogs';
+        const filePath = `${folder}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('gallery')
