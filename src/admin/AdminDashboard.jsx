@@ -40,8 +40,10 @@ const AdminDashboard = ({ onLogout }) => {
       return;
     }
 
+    const previewUrl = URL.createObjectURL(file);
     setGalleryImageFile(file);
-    setGalleryImagePreview(URL.createObjectURL(file));
+    setGalleryImagePreview(previewUrl);
+    setFormData((prev) => ({ ...prev, image: previewUrl }));
   };
 
   // --- CHARGEMENT DES DONNÉES ---
@@ -89,11 +91,17 @@ const AdminDashboard = ({ onLogout }) => {
         cleanData.image = (cleanData.image && cleanData.image.trim() !== '') ? cleanData.image.trim() : null;
       }
 
-      // Upload de l'image uniquement pour la galerie
-      if (modalTab === 'gallery' && galleryImageFile) {
+      // Upload de l'image pour la galerie, les actions et le blog si un fichier a été sélectionné
+      if ((modalTab === 'gallery' || modalTab === 'actions' || modalTab === 'blogs') && galleryImageFile) {
+        if (!supabase) {
+          throw new Error('Les variables VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY sont absentes. Configurez Supabase avant d’envoyer une image.');
+        }
+
         const fileExt = galleryImageFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `gallery/${fileName}`;
+        // utiliser un dossier distinct par type pour faciliter l'organisation
+        const folder = modalTab === 'gallery' ? 'gallery' : modalTab === 'actions' ? 'actions' : 'blogs';
+        const filePath = `${folder}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('gallery')
