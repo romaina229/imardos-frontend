@@ -41,6 +41,10 @@ const partners = [
     name: "ABPF",
     logo: "/logos/logoabpf.jpg",
   },
+  {
+    name: "MS",
+    logo: "/logos/logo-MS.png"
+  }
 ];
 
 const PartnersSection = () => {
