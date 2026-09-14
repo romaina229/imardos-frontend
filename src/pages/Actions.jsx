@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapPin, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { apiClient } from '../api/config';
 
 const Actions = () => {
@@ -58,14 +59,19 @@ const Actions = () => {
                 {filteredActions.map((action) => (
                   <div key={action.id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group border border-gray-100">
                     <div className="relative h-56 overflow-hidden">
-                      <img src={action.image || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800'} alt={action.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img
+                        src={action.image || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800'}
+                        alt={action.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 bg-gray-100"
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800'; }}
+                      />
                       <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium text-white flex items-center gap-1.5 shadow-md ${action.status === 'En cours' ? 'bg-imardos-orange' : action.status === 'Terminé' ? 'bg-imardos-green' : 'bg-gray-500'}`}>{getStatusIcon(action.status)}{action.status}</div>
                     </div>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-2"><h3 className="text-xl font-bold text-imardos-blue leading-tight pr-4">{action.title}</h3><span className="text-xs font-medium bg-imardos-light-blue text-imardos-blue px-2 py-1 rounded">{action.category}</span></div>
                       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4"><MapPin size={16} className="text-imardos-orange" /><span>{action.location}</span></div>
                       <p className="text-gray-600 text-sm line-clamp-3 mb-6 leading-relaxed">{action.description}</p>
-                      <button className="w-full py-2.5 border border-imardos-blue text-imardos-blue rounded-lg font-medium hover:bg-imardos-blue hover:text-white transition-colors duration-300 text-sm">Lire la suite</button>
+                      <Link to={`/nos-actions/${action.id}`} className="block w-full text-center py-2.5 border border-imardos-blue text-imardos-blue rounded-lg font-medium hover:bg-imardos-blue hover:text-white transition-colors duration-300 text-sm">Lire la suite</Link>
                     </div>
                   </div>
                 ))}

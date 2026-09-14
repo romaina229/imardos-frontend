@@ -10,6 +10,7 @@ import TestimonialsSection from './components/home/TestimonialsSection';
 import GallerySection from './components/home/GallerySection';
 import About from './pages/About';
 import Actions from './pages/Actions';
+import ActionDetail from './pages/ActionDetail';
 import Contact from './pages/Contact';
 import Donate from './pages/Donate';
 import AdminLogin from './admin/AdminLogin';
@@ -61,6 +62,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/a-propos" element={<About />} />
             <Route path="/nos-actions" element={<Actions />} />
+            <Route path="/nos-actions/:id" element={<ActionDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/don" element={<Donate />} />
             {/* --- AJOUTEZ CES 4 LIGNES ICI (DANS LES ROUTES) --- */}

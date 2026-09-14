@@ -104,9 +104,12 @@ const ProjectsSection = () => {
 
                 {/* Bouton Lire la suite (au survol ou toujours visible) */}
                 <div className="mt-6">
-                  <button className="w-full py-2 border border-imardos-blue text-imardos-blue rounded-full font-medium hover:bg-imardos-blue hover:text-white transition-colors duration-300">
+                  <Link
+                    to="/nos-actions"
+                    className="block w-full text-center py-2 border border-imardos-blue text-imardos-blue rounded-full font-medium hover:bg-imardos-blue hover:text-white transition-colors duration-300"
+                  >
                     En savoir plus
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -4,6 +4,9 @@ import { apiClient } from '../api/config';
 import { formatDate } from '../utils/dateFormatter';
 import { supabase } from '../api/lib/supabase';
 
+// Image de secours affichée quand l'URL enregistrée est cassée ou inaccessible
+const PLACEHOLDER_IMAGE = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f3f4f6'/%3E%3Cpath d='M60 130 L85 100 L105 122 L135 85 L150 130 Z' fill='%23d1d5db'/%3E%3Ccircle cx='75' cy='80' r='12' fill='%23d1d5db'/%3E%3C/svg%3E";
+
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('actions');
 
@@ -39,6 +42,8 @@ const AdminDashboard = ({ onLogout }) => {
       alert('Veuillez sélectionner une image valide.');
       return;
     }
+
+    if (galleryImagePreview) URL.revokeObjectURL(galleryImagePreview);
 
     const previewUrl = URL.createObjectURL(file);
     setGalleryImageFile(file);
@@ -209,13 +214,13 @@ const AdminDashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-imardos-blue text-white px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
-        <h1 className="text-xl font-bold">Tableau de bord IMARDOS</h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50">
+      <div className="bg-imardos-blue text-white px-8 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
+        <h1 className="text-xl font-bold tracking-tight">Tableau de bord IMARDOS</h1>
         <button onClick={onLogout} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors text-sm"><LogOut size={18} /> Déconnexion</button>
       </div>
 
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-[72px] z-40">
+      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-[72px] z-40">
         <div className="container mx-auto px-4 flex overflow-x-auto">
           <TabButton icon={<HeartHandshake size={18} />} label="Nos actions" tab="actions" activeTab={activeTab} setActiveTab={setActiveTab} />
           <TabButton icon={<Briefcase size={18} />} label="Offres d'emploi" tab="jobs" activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -249,10 +254,14 @@ const AdminDashboard = ({ onLogout }) => {
                     <Input label="Localisation" name="location" value={formData.location} onChange={handleChange} required />
                   </div>
                   <div><label className="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea name="description" value={formData.description || ''} onChange={handleChange} rows="3" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Statut</label><select name="status" value={formData.status || 'En cours'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="En cours">En cours</option><option value="Terminé">Terminé</option><option value="À venir">À venir</option></select></div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <select name="status" value={formData.status || 'En cours'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="En cours">En cours</option><option value="Terminé">Terminé</option><option value="À venir">À venir</option></select>
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Image *
+                      Image {!editingItem && '*'}
                     </label>
 
                     <input
@@ -260,7 +269,7 @@ const AdminDashboard = ({ onLogout }) => {
                       accept="image/jpeg,image/png,image/webp,image/gif"
                       onChange={handleGalleryImageChange}
                       required={!editingItem}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-imardos-light-blue file:text-imardos-blue file:font-medium hover:file:bg-blue-100 cursor-pointer"
                     />
 
                     {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
@@ -274,10 +283,10 @@ const AdminDashboard = ({ onLogout }) => {
 
                     {editingItem && !galleryImageFile && formData.image && (
                       <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
-                        <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                        <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200 bg-gray-100" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}/>
                       </div>
                     )}
-                    </div>
+                  </div>
                 </>
               )}
 
@@ -308,7 +317,7 @@ const AdminDashboard = ({ onLogout }) => {
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={handleGalleryImageChange}
                   required={!editingItem}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-imardos-light-blue file:text-imardos-blue file:font-medium hover:file:bg-blue-100 cursor-pointer"
                 />
 
                 {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
@@ -322,7 +331,7 @@ const AdminDashboard = ({ onLogout }) => {
 
                 {editingItem && !galleryImageFile && formData.image && (
                   <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
-                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200 bg-gray-100" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}/>
                   </div>
                 )}
                 </div></>
@@ -339,7 +348,7 @@ const AdminDashboard = ({ onLogout }) => {
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={handleGalleryImageChange}
                   required={!editingItem}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-imardos-light-blue file:text-imardos-blue file:font-medium hover:file:bg-blue-100 cursor-pointer"
                 />
 
                 {galleryImagePreview && (<div className="mt-3"><p className="text-sm text-gray-500 mb-2">Aperçu :</p>
@@ -353,7 +362,7 @@ const AdminDashboard = ({ onLogout }) => {
 
                 {editingItem && !galleryImageFile && formData.image && (
                   <div className="mt-3"><p className="text-sm text-gray-500 mb-2">Image actuelle :</p>
-                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200"/>
+                    <img src={formData.image} alt="Image actuelle" className="w-full max-h-64 object-cover rounded-lg border border-gray-200 bg-gray-100" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}/>
                   </div>
                 )}
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Résumé (Excerpt)</label><textarea name="excerpt" value={formData.excerpt || ''} onChange={handleChange} rows="2" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Contenu (HTML autorisé)</label><textarea name="content" value={formData.content || ''} onChange={handleChange} rows="4" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea></div></>
@@ -434,14 +443,19 @@ const Input = ({ label, name, required, type = 'text', value, onChange }) => (
 );
 const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateColumn=null, onAdd, onEdit, onDelete }) => (
   <div>
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
       <h2 className="text-2xl font-bold text-imardos-blue">{title}</h2>
-      {onAdd && ( <button onClick={onAdd} className="bg-imardos-orange hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md"><Plus size={18} /> Ajouter</button> )}
+      {onAdd && ( <button onClick={onAdd} className="bg-imardos-orange hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"><Plus size={18} /> Ajouter</button> )}
     </div>
-    {data.length === 0 ? <div className="text-center py-12 bg-white rounded-xl shadow-sm text-gray-500">Aucun élément trouvé dans la base de données.</div> : 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+    {data.length === 0 ? (
+      <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400">
+        <FolderOpen size={36} className="mx-auto mb-3 text-gray-300" />
+        <p className="text-gray-500">Aucun élément trouvé dans la base de données.</p>
+      </div>
+    ) : 
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-gray-100 text-gray-600 text-sm font-medium">
+          <thead className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide font-semibold border-b border-gray-200">
             <tr>
               {columns.map((col, i) => <th key={i} className="px-6 py-4">{col}</th>)}
               <th className="px-6 py-4 text-right">Actions</th>
@@ -455,7 +469,20 @@ const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateC
                   ? formatDate(item[key]) 
                   : item[key];
                 return <td key={i} className="px-6 py-4 text-sm text-gray-700">
-                  {isGallery && key === 'image' ? <img src={item[key]} alt="Thumb" className="w-12 h-12 object-cover rounded-md border border-gray-200" /> : (key === 'is_read' ? (item[key] ? <span className="text-green-600 font-medium">Lu</span> : <span className="text-imardos-orange font-medium">Non lu</span>) : value )}
+                  {isGallery && key === 'image' ? (
+                    item[key] ? (
+                      <img
+                        src={item[key]}
+                        alt="Thumb"
+                        className="w-12 h-12 object-cover rounded-md border border-gray-200 bg-gray-100"
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-md border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center text-gray-300">
+                        <ImageIcon size={18} />
+                      </div>
+                    )
+                  ) : (key === 'is_read' ? (item[key] ? <span className="text-green-600 font-medium">Lu</span> : <span className="text-imardos-orange font-medium">Non lu</span>) : value )}
                 </td>
               })}
                 <td className="px-6 py-4 flex justify-end gap-2">
@@ -470,6 +497,6 @@ const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateC
     }
   </div>
 );
-const getLabel = (tab) => { if (tab === 'actions') return "une action"; if (tab === 'jobs') return "une offre d'emploi"; if (tab === 'events') return "un évènement"; if (tab === 'gallery') return "une photo"; if (tab === 'job-results') return "un avis"; if (tab === 'blogs') return "un article de blog"; return "un élément"; if (tab === 'resources') return "une ressource"; };
+const getLabel = (tab) => { if (tab === 'actions') return "une action"; if (tab === 'jobs') return "une offre d'emploi"; if (tab === 'events') return "un évènement"; if (tab === 'gallery') return "une photo"; if (tab === 'job-results') return "un avis"; if (tab === 'blogs') return "un article de blog"; if (tab === 'resources') return "une ressource"; return "un élément"; };
 
 export default AdminDashboard;
