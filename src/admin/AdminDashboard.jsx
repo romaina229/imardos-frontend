@@ -1,14 +1,55 @@
 import { useState, useEffect } from 'react';
-import { Plus, FileText, Phone, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, MessageSquare, HeartHandshake, PenLine, FolderOpen, Check } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Plus, FileText, Mail, Edit, Trash2, LogOut, X, Loader2, Briefcase, Calendar, Image as ImageIcon, HeartHandshake, PenLine, FolderOpen, Menu, Settings as SettingsIcon, ExternalLink } from 'lucide-react';
 import { apiClient } from '../api/config';
 import { formatDate } from '../utils/dateFormatter';
 import { supabase } from '../api/lib/supabase';
+import AdminSettings from './AdminSettings';
 
 // Image de secours affichée quand l'URL enregistrée est cassée ou inaccessible
 const PLACEHOLDER_IMAGE = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f3f4f6'/%3E%3Cpath d='M60 130 L85 100 L105 122 L135 85 L150 130 Z' fill='%23d1d5db'/%3E%3Ccircle cx='75' cy='80' r='12' fill='%23d1d5db'/%3E%3C/svg%3E";
 
-const AdminDashboard = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState('actions');
+// --- NAVIGATION DE LA BARRE LATÉRALE ---
+const NAV_GROUPS = [
+  {
+    label: 'Contenu du site',
+    items: [
+      { tab: 'actions', label: 'Nos actions', icon: HeartHandshake },
+      { tab: 'events', label: 'Évènements', icon: Calendar },
+      { tab: 'gallery', label: 'Galerie', icon: ImageIcon },
+      { tab: 'blogs', label: 'Blog', icon: PenLine },
+      { tab: 'resources', label: 'Ressources', icon: FolderOpen },
+    ],
+  },
+  {
+    label: 'Recrutement',
+    items: [
+      { tab: 'jobs', label: "Offres d'emploi", icon: Briefcase },
+      { tab: 'job-results', label: 'Résultats des offres', icon: FileText },
+    ],
+  },
+  {
+    label: 'Communication',
+    items: [{ tab: 'contacts', label: 'Messages contact', icon: Mail }],
+  },
+  {
+    label: 'Administration',
+    items: [{ tab: 'settings', label: 'Paramètres', icon: SettingsIcon }],
+  },
+];
+const NAV_ITEMS = NAV_GROUPS.flatMap((group) => group.items);
+const DEFAULT_TAB = 'actions';
+
+const AdminDashboard = ({ user, onLogout, onUserUpdate }) => {
+  // La section active est conservée dans l'URL (/admin?section=blogs) :
+  // après un rechargement de page, on revient exactement là où on était.
+  const [searchParams] = useSearchParams();
+  const sectionParam = searchParams.get('section');
+  const activeTab = NAV_ITEMS.some((item) => item.tab === sectionParam) ? sectionParam : DEFAULT_TAB;
+  const currentItem = NAV_ITEMS.find((item) => item.tab === activeTab);
+
+  // Barre latérale : tiroir sur mobile, toujours visible sur grand écran
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // États des données
   const [actions, setActions] = useState([]);
@@ -72,8 +113,19 @@ const AdminDashboard = ({ onLogout }) => {
   };
 
   useEffect(() => {
-    fetchData(activeTab);
+    // « Paramètres » charge ses propres données
+    if (activeTab !== 'settings') fetchData(activeTab);
   }, [activeTab]);
+
+  // Échap ferme le tiroir de navigation sur mobile
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [sidebarOpen]);
 
   // --- MODALE ---
   const openCreateModal = (tab) => {
@@ -214,27 +266,104 @@ const AdminDashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50">
-      <div className="bg-imardos-blue text-white px-8 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
-        <h1 className="text-xl font-bold tracking-tight">Tableau de bord IMARDOS</h1>
-        <button onClick={onLogout} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors text-sm"><LogOut size={18} /> Déconnexion</button>
-      </div>
+    <div className="min-h-screen bg-gray-50 lg:flex">
+      {/* Fond assombri derrière le tiroir (mobile) */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
+      )}
 
-      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-[72px] z-40">
-        <div className="container mx-auto px-4 flex overflow-x-auto">
-          <TabButton icon={<HeartHandshake size={18} />} label="Nos actions" tab="actions" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<Briefcase size={18} />} label="Offres d'emploi" tab="jobs" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<Calendar size={18} />} label="Évènements" tab="events" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<ImageIcon size={18} />} label="Galerie" tab="gallery" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<FileText size={18} />} label="Résultats des offres" tab="job-results" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<PenLine size={18} />} label="Blog" tab="blogs" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<FolderOpen size={18} />} label="Ressources" tab="resources" activeTab={activeTab} setActiveTab={setActiveTab} />
-          <TabButton icon={<Phone size={18} />} label="Messages contact" tab="contacts" activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* BARRE LATÉRALE */}
+      <aside
+        id="admin-sidebar"
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-imardos-blue text-white flex flex-col shadow-xl transition-[transform,visibility] duration-200 motion-reduce:transition-none lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:max-w-none lg:shrink-0 lg:translate-x-0 lg:visible lg:shadow-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full invisible'}`}
+      >
+        <div className="flex items-center gap-3 px-5 py-5 border-b border-white/15">
+          <div className="h-10 w-10 shrink-0 rounded-full bg-imardos-light-blue overflow-hidden">
+            <img src="/files/IMARDOS-logo-principal.png" alt="" className="h-full w-full object-cover scale-110" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold leading-tight">IMARDOS</p>
+            <p className="text-xs text-white/70">Administration</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Fermer le menu"
+            className="lg:hidden p-1 rounded-lg hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-imardos-orange"
+          >
+            <X size={22} />
+          </button>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {loading ? <div className="text-center py-12"><Loader2 className="animate-spin text-imardos-blue mx-auto mb-2" size={32} /><p className="text-gray-500">Chargement depuis la base de données...</p></div> : renderTabContent()}
+        <nav aria-label="Navigation de l'administration" className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label}>
+              <p className="px-3 mb-1 text-xs font-medium text-white/70">{group.label}</p>
+              <ul className="space-y-1">
+                {group.items.map((item) => (
+                  <li key={item.tab}>
+                    <SidebarLink item={item} isActive={activeTab === item.tab} onNavigate={() => setSidebarOpen(false)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        <div className="border-t border-white/15 p-4 space-y-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div aria-hidden="true" className="h-9 w-9 shrink-0 rounded-full bg-white/15 flex items-center justify-center font-bold">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{user?.name}</p>
+              <p className="text-xs text-white/70 truncate">{user?.email}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              to="/"
+              className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors text-sm focus-visible:outline-2 focus-visible:outline-imardos-orange"
+            >
+              <ExternalLink size={16} aria-hidden="true" /> Voir le site
+            </Link>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors text-sm focus-visible:outline-2 focus-visible:outline-imardos-orange"
+            >
+              <LogOut size={16} aria-hidden="true" /> Déconnexion
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* CONTENU */}
+      <div className="flex-1 min-w-0">
+        {/* Barre du haut (mobile uniquement) : bouton de menu + section en cours */}
+        <header className="lg:hidden sticky top-0 z-30 bg-imardos-blue text-white flex items-center gap-3 px-4 py-3 shadow-md">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Ouvrir le menu"
+            aria-expanded={sidebarOpen}
+            aria-controls="admin-sidebar"
+            className="p-1 rounded-lg hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-imardos-orange"
+          >
+            <Menu size={24} />
+          </button>
+          <span className="font-bold">{currentItem?.label}</span>
+        </header>
+
+        <div className="p-4 sm:p-6 lg:p-8">
+          {activeTab === 'settings' ? (
+            <AdminSettings user={user} onUserUpdate={onUserUpdate} />
+          ) : loading ? (
+            <div className="text-center py-12"><Loader2 className="animate-spin text-imardos-blue mx-auto mb-2" size={32} /><p className="text-gray-500">Chargement depuis la base de données...</p></div>
+          ) : (
+            renderTabContent()
+          )}
+        </div>
       </div>
 
       {/* MODALE DE FORMULAIRE UNIQUE */}
@@ -384,29 +513,6 @@ const AdminDashboard = ({ onLogout }) => {
                 </>
               )}
 
-              {/* CHAMPS AVIS (LIÉS AUX OFFRES D'EMPLOI) */}
-              {modalTab === 'job-results' && (
-                <>
-                  <Input label="Nom de l'auteur" name="name" value={formData.name} onChange={handleChange} required />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Offre d'emploi concernée (Job Title)</label>
-                    <input type="text" name="job_title" value={formData.job_title || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition" placeholder="Ex: Chargé(e) de Projet Santé" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Note (1 à 5)</label>
-                    <select name="rating" value={formData.rating || 5} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition">{ [1,2,3,4,5].map(r => <option key={r} value={r}>{r} étoiles</option>) }</select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire sur le recrutement</label>
-                    <textarea name="comment" value={formData.comment || ''} onChange={handleChange} rows="3" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition resize-none"></textarea>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Statut de modération</label>
-                    <select name="status" value={formData.status || 'En attente'} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition"><option value="En attente">En attente</option><option value="Publié">Publié</option><option value="Rejeté">Rejeté</option></select>
-                  </div>
-                </>
-              )}
-
               {modalTab === 'job-results' && (
                 <>
                   <Input label="Titre du résultat (ex: Recrutement 2024)" name="name" value={formData.name} onChange={handleChange} required />
@@ -435,9 +541,19 @@ const AdminDashboard = ({ onLogout }) => {
 };
 
 // --- SOUS-COMPOSANTS ---
-const TabButton = ({ icon, label, tab, activeTab, setActiveTab }) => (
-  <button onClick={() => setActiveTab(tab)} className={`flex items-center gap-2 px-6 py-4 border-b-4 font-medium text-sm transition-all whitespace-nowrap ${activeTab === tab ? 'border-imardos-orange text-imardos-blue bg-imardos-light-blue/30' : 'border-transparent text-gray-500 hover:text-imardos-blue hover:bg-gray-50'}`}>{icon} {label}</button>
-);
+const SidebarLink = ({ item, isActive, onNavigate }) => {
+  const Icon = item.icon;
+  return (
+    <Link
+      to={`/admin?section=${item.tab}`}
+      onClick={onNavigate}
+      aria-current={isActive ? 'page' : undefined}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-imardos-orange ${isActive ? 'bg-white/15 border-imardos-orange text-white' : 'border-transparent text-white/80 hover:bg-white/10 hover:text-white'}`}
+    >
+      <Icon size={18} aria-hidden="true" /> {item.label}
+    </Link>
+  );
+};
 const Input = ({ label, name, required, type = 'text', value, onChange }) => (
   <div><label className="block text-sm font-medium text-gray-700 mb-1">{label} {required && '*'}</label><input type={type} name={name} value={value || ''} onChange={onChange} required={required} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-imardos-orange outline-none transition" /></div>
 );
@@ -453,7 +569,7 @@ const TabContent = ({ title, data, columns, keys, isGallery = false, formatDateC
         <p className="text-gray-500">Aucun élément trouvé dans la base de données.</p>
       </div>
     ) : 
-      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-x-auto">
         <table className="w-full text-left">
           <thead className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide font-semibold border-b border-gray-200">
             <tr>
